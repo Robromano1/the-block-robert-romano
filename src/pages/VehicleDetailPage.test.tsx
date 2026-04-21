@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router'
+import { BidProvider } from '@/context/BidContext'
 import { VehicleDetailPage } from './VehicleDetailPage'
 import vehicleData from '../../data/vehicles.json'
 import type { Vehicle } from '@/types/vehicle'
@@ -10,11 +11,13 @@ const testVehicle = vehicleData[0] as Vehicle
 
 function renderDetailPage(vehicleId: string) {
   return render(
-    <MemoryRouter initialEntries={[`/vehicles/${vehicleId}`]}>
-      <Routes>
-        <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
-      </Routes>
-    </MemoryRouter>,
+    <BidProvider>
+      <MemoryRouter initialEntries={[`/vehicles/${vehicleId}`]}>
+        <Routes>
+          <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    </BidProvider>,
   )
 }
 
@@ -58,7 +61,7 @@ describe('VehicleDetailPage', () => {
 
     it('renders thumbnail buttons for multiple images', () => {
       renderDetailPage(testVehicle.id)
-      const thumbnails = screen.getAllByRole('button')
+      const thumbnails = screen.getAllByAltText(/Thumbnail/)
       expect(thumbnails.length).toBe(testVehicle.images.length)
     })
 
