@@ -1,6 +1,8 @@
 import { useParams, Link } from 'react-router'
 import { useVehicle } from '@/hooks/useVehicle'
+import { useBidContext } from '@/context/BidContext'
 import { ImageGallery } from '@/components/ImageGallery'
+import { BidForm } from '@/components/BidForm'
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-CA', {
@@ -52,8 +54,10 @@ export function VehicleDetailPage() {
     )
   }
 
-  const effectivePrice = vehicle.current_bid ?? vehicle.starting_bid
-  const hasBids = vehicle.bid_count > 0
+  const { getEffectiveBid, getEffectiveBidCount, placeBid } = useBidContext()
+  const effectivePrice = getEffectiveBid(vehicle.id, vehicle.current_bid, vehicle.starting_bid)
+  const effectiveBidCount = getEffectiveBidCount(vehicle.id, vehicle.bid_count)
+  const hasBids = effectiveBidCount > 0
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`
 
   return (
@@ -70,10 +74,10 @@ export function VehicleDetailPage() {
 
           <div className="space-y-6">
             <div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-gray-500">
                 <span>Lot {vehicle.lot}</span>
                 <span>&middot;</span>
-                <span>{vehicle.vin}</span>
+                <span className="break-all">{vehicle.vin}</span>
               </div>
               <h1 className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
                 {title}
@@ -90,7 +94,7 @@ export function VehicleDetailPage() {
                   <p className="text-3xl font-bold text-gray-900">{formatCurrency(effectivePrice)}</p>
                 </div>
                 <p className="text-sm text-gray-500">
-                  {hasBids ? `${vehicle.bid_count} bid${vehicle.bid_count !== 1 ? 's' : ''}` : 'No bids yet'}
+                  {hasBids ? `${effectiveBidCount} bid${effectiveBidCount !== 1 ? 's' : ''}` : 'No bids yet'}
                 </p>
               </div>
               {vehicle.reserve_price && (
@@ -107,6 +111,11 @@ export function VehicleDetailPage() {
                 </p>
               )}
             </div>
+
+            <BidForm
+              currentHighest={effectivePrice}
+              onPlaceBid={(amount) => placeBid(vehicle.id, amount)}
+            />
 
             <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="text-lg font-semibold text-gray-900">Specifications</h2>
