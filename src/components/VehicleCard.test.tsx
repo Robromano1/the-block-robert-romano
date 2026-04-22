@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
+import { BidProvider } from '@/context/BidContext'
 import { VehicleCard } from './VehicleCard'
 import type { Vehicle } from '@/types/vehicle'
 
@@ -42,7 +43,9 @@ function createVehicle(overrides: Partial<Vehicle> = {}): Vehicle {
 function renderCard(vehicle: Vehicle) {
   return render(
     <MemoryRouter>
-      <VehicleCard vehicle={vehicle} />
+      <BidProvider>
+        <VehicleCard vehicle={vehicle} />
+      </BidProvider>
     </MemoryRouter>,
   )
 }

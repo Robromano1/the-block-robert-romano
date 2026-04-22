@@ -32,6 +32,8 @@ describe('BidForm', () => {
     const user = userEvent.setup()
     renderBidForm(16000)
 
+    const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.click(screen.getByText('Review Bid'))
 
     expect(screen.getByText(/valid bid amount/)).toBeInTheDocument()
@@ -42,6 +44,7 @@ describe('BidForm', () => {
     renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '17000')
     await user.click(screen.getByText('Review Bid'))
 
@@ -54,6 +57,7 @@ describe('BidForm', () => {
     const { onPlaceBid } = renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '17000')
     await user.click(screen.getByText('Review Bid'))
     await user.click(screen.getByText('Confirm Bid'))
@@ -66,6 +70,7 @@ describe('BidForm', () => {
     renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '17000')
     await user.click(screen.getByText('Review Bid'))
     await user.click(screen.getByText('Confirm Bid'))
@@ -78,6 +83,7 @@ describe('BidForm', () => {
     const { onPlaceBid } = renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '17000')
     await user.click(screen.getByText('Review Bid'))
     await user.click(screen.getByText('Cancel'))
@@ -91,6 +97,7 @@ describe('BidForm', () => {
     renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '17000')
     await user.click(screen.getByText('Review Bid'))
     await user.click(screen.getByText('Confirm Bid'))
@@ -104,10 +111,17 @@ describe('BidForm', () => {
     const { onPlaceBid } = renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '17000')
     await user.click(screen.getByText('Review Bid'))
 
     expect(onPlaceBid).not.toHaveBeenCalled()
+  })
+
+  it('pre-fills input with minimum bid amount', () => {
+    renderBidForm(16000)
+    const input = screen.getByLabelText(/bid amount/i) as HTMLInputElement
+    expect(input.value).toBe('16100')
   })
 
   it('accepts comma-formatted input (e.g. 21,100)', async () => {
@@ -115,6 +129,7 @@ describe('BidForm', () => {
     const { onPlaceBid } = renderBidForm(16000)
 
     const input = screen.getByLabelText(/bid amount/i)
+    await user.clear(input)
     await user.type(input, '21,100')
     await user.click(screen.getByText('Review Bid'))
 
