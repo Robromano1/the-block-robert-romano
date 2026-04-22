@@ -4,7 +4,10 @@ import { useBidContext } from '@/context/BidContext'
 import { formatCurrency } from '@/lib/format'
 import { ImageGallery } from '@/components/ImageGallery'
 import { BidForm } from '@/components/BidForm'
+import { BuyNowButton } from '@/components/BuyNowButton'
 import { ConditionBadge } from '@/components/ConditionBadge'
+import { AuctionBadge } from '@/components/AuctionBadge'
+import { getAuctionStatus } from '@/lib/auction'
 
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
@@ -40,6 +43,7 @@ export function VehicleDetailPage() {
   const effectiveBidCount = getEffectiveBidCount(vehicle.id, vehicle.bid_count)
   const hasBids = effectiveBidCount > 0
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`
+  const auctionStatus = getAuctionStatus(vehicle.auction_start)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,7 +67,10 @@ export function VehicleDetailPage() {
               <h1 className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
                 {title}
               </h1>
-              <p className="mt-0.5 text-lg text-gray-600">{vehicle.trim}</p>
+              <div className="mt-1 flex items-center gap-3">
+                <p className="text-lg text-gray-600">{vehicle.trim}</p>
+                <AuctionBadge auctionStart={vehicle.auction_start} variant="full" />
+              </div>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -86,17 +93,41 @@ export function VehicleDetailPage() {
                   )}
                 </p>
               )}
-              {vehicle.buy_now_price && (
+              {vehicle.buy_now_price && auctionStatus !== 'live' && (
                 <p className="mt-1 text-sm text-gray-500">
                   Buy Now: {formatCurrency(vehicle.buy_now_price)}
                 </p>
               )}
             </div>
 
-            <BidForm
-              currentHighest={effectivePrice}
-              onPlaceBid={(amount) => placeBid(vehicle.id, amount)}
-            />
+            {auctionStatus === 'live' && (
+              <>
+                <BidForm
+                  currentHighest={effectivePrice}
+                  onPlaceBid={(amount) => placeBid(vehicle.id, amount)}
+                />
+                {vehicle.buy_now_price && (
+                  <BuyNowButton
+                    price={vehicle.buy_now_price}
+                    onBuyNow={() => placeBid(vehicle.id, vehicle.buy_now_price!)}
+                  />
+                )}
+              </>
+            )}
+            {auctionStatus === 'upcoming' && (
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-5 text-center">
+                <p className="text-sm font-medium text-blue-800">
+                  Bidding has not started yet. This auction is upcoming.
+                </p>
+              </div>
+            )}
+            {auctionStatus === 'ended' && (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-5 text-center">
+                <p className="text-sm font-medium text-gray-500">
+                  This auction has ended.
+                </p>
+              </div>
+            )}
 
             <div className="rounded-xl border border-gray-200 bg-white p-5">
               <h2 className="text-lg font-semibold text-gray-900">Specifications</h2>

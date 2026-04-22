@@ -2,12 +2,15 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
+import { BidProvider } from '@/context/BidContext'
 import { InventoryPage } from './InventoryPage'
 
 function renderPage() {
   return render(
     <MemoryRouter>
-      <InventoryPage />
+      <BidProvider>
+        <InventoryPage />
+      </BidProvider>
     </MemoryRouter>,
   )
 }
