@@ -25,14 +25,14 @@ The app will be available at **http://localhost:5173**.
 
 ## Available Scripts
 
-| Command           | Description                              |
-| ----------------- | ---------------------------------------- |
-| `npm run dev`     | Start the Vite dev server with HMR       |
-| `npm run build`   | Type-check and build for production      |
-| `npm run preview` | Preview the production build locally     |
-| `npm run test`    | Run tests in watch mode                  |
-| `npm run test:run`| Run tests once (CI-friendly)             |
-| `npm run lint`    | Run ESLint                               |
+| Command            | Description                              |
+| ------------------ | ---------------------------------------- |
+| `npm run dev`      | Start the Vite dev server with HMR       |
+| `npm run build`    | Type-check and build for production      |
+| `npm run preview`  | Preview the production build locally     |
+| `npm run test`     | Run tests in watch mode                  |
+| `npm run test:run` | Run tests once (CI-friendly)             |
+| `npm run lint`     | Run ESLint                               |
 
 ## Stack
 
@@ -46,12 +46,13 @@ The app will be available at **http://localhost:5173**.
 
 ```
 src/
-  components/   # Reusable UI components (SearchBar, FilterPanel, VehicleCard, BidForm, ImageGallery)
+  components/   # UI components (VehicleCard, BidForm, BuyNowButton, AuctionBadge, ImageGallery, ConditionBadge, etc.)
   context/      # React Context providers (BidContext)
-  hooks/        # Custom React hooks (useVehicles, useVehicleFilters, useBids, useVehicle)
-  pages/        # Page-level route components (InventoryPage, VehicleDetailPage)
+  hooks/        # Custom hooks (useVehicles, useVehicleFilters, useBids, useVehicle, useCountdown)
+  lib/          # Utility modules (auction status/timers, currency formatting)
+  pages/        # Route components (InventoryPage, VehicleDetailPage)
   types/        # TypeScript interfaces and types
-  test/         # Test setup and utilities
+  test/         # Test setup
   App.tsx       # Root component with routing
   main.tsx      # Application entry point
 data/
@@ -66,13 +67,18 @@ data/
 - **Sorting** — sort by lot number, price, or year
 - **Vehicle details** — full specs, condition report, damage notes, seller info, and image gallery
 - **Bidding** — place bids with $100 minimum increment, confirmation step, and validation
+- **Buy Now** — one-click purchase with confirmation for vehicles that support it
+- **Auction status** — live countdown timers; badges (upcoming/live/ended) on cards and detail pages
 - **Persistence** — bids are stored in localStorage and survive page refresh
+- **Consistent state** — bids placed on detail pages are immediately reflected on inventory cards
 - **Responsive** — mobile-first design that works on all screen sizes
 
 ## Design Decisions
 
 - **Frontend-only** — all data is loaded from a static JSON file; no backend required
 - **localStorage for bids** — simple persistence that demonstrates state management without needing a server
-- **React Context for shared bid state** — bids placed on the detail page are reflected across the app
+- **React Context for shared bid state** — bids placed on the detail page are reflected across the app via `getEffectiveBid` / `getEffectiveBidCount`
+- **Auction time normalization** — synthetic dates are shifted relative to "now" so the prototype shows a realistic mix of upcoming, live, and ended auctions
+- **Conditional actions** — bid form and Buy Now only appear for live auctions; upcoming and ended auctions show appropriate status messages
 - **Tailwind CSS** — utility-first styling for rapid, consistent UI development
 - **Accessible forms** — all inputs have associated labels, touch-friendly sizing, and no iOS auto-zoom
