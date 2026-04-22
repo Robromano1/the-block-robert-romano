@@ -117,3 +117,6 @@ Additionally, I used Playwright MCP for manual browser testing throughout develo
 - **Accessibility audit** — full screen reader testing, ARIA live regions for countdown updates and bid confirmations
 - **E2E test suite** — formalize the Playwright testing into a CI-runnable suite covering the critical buyer flows
 - **Backend API** — replace localStorage with a real persistence layer, enable multi-user bidding with optimistic updates and conflict resolution
+- Possibly implement semantic search using a RAG pipeline and Vector Database instead of keyword search and filters
+- Continue improving upon UI
+- Lazy loading of vehicles on main page
