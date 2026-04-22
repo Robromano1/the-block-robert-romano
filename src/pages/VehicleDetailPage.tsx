@@ -1,29 +1,10 @@
 import { useParams, Link } from 'react-router'
 import { useVehicle } from '@/hooks/useVehicle'
 import { useBidContext } from '@/context/BidContext'
+import { formatCurrency } from '@/lib/format'
 import { ImageGallery } from '@/components/ImageGallery'
 import { BidForm } from '@/components/BidForm'
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-CA', {
-    style: 'currency',
-    currency: 'CAD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
-function ConditionBadge({ grade }: { grade: number }) {
-  let color = 'bg-red-100 text-red-700'
-  if (grade >= 4) color = 'bg-green-100 text-green-700'
-  else if (grade >= 3) color = 'bg-yellow-100 text-yellow-700'
-
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-sm font-medium ${color}`}>
-      {grade.toFixed(1)} / 5.0
-    </span>
-  )
-}
+import { ConditionBadge } from '@/components/ConditionBadge'
 
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
@@ -37,6 +18,7 @@ function SpecRow({ label, value }: { label: string; value: string }) {
 export function VehicleDetailPage() {
   const { id } = useParams<{ id: string }>()
   const vehicle = useVehicle(id)
+  const { getEffectiveBid, getEffectiveBidCount, placeBid } = useBidContext()
 
   if (!vehicle) {
     return (
@@ -54,7 +36,6 @@ export function VehicleDetailPage() {
     )
   }
 
-  const { getEffectiveBid, getEffectiveBidCount, placeBid } = useBidContext()
   const effectivePrice = getEffectiveBid(vehicle.id, vehicle.current_bid, vehicle.starting_bid)
   const effectiveBidCount = getEffectiveBidCount(vehicle.id, vehicle.bid_count)
   const hasBids = effectiveBidCount > 0
@@ -134,7 +115,7 @@ export function VehicleDetailPage() {
             <div className="rounded-xl border border-gray-200 bg-white p-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Condition</h2>
-                <ConditionBadge grade={vehicle.condition_grade} />
+                <ConditionBadge grade={vehicle.condition_grade} showScale />
               </div>
               <p className="mt-3 text-sm text-gray-700 leading-relaxed">
                 {vehicle.condition_report}

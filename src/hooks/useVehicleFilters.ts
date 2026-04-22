@@ -15,8 +15,7 @@ function getEffectivePrice(vehicle: Vehicle): number {
   return vehicle.current_bid ?? vehicle.starting_bid
 }
 
-function matchesSearch(vehicle: Vehicle, query: string): boolean {
-  const normalizedQuery = query.toLowerCase()
+function matchesSearch(vehicle: Vehicle, normalizedQuery: string): boolean {
   return [
     vehicle.make,
     vehicle.model,
@@ -28,17 +27,19 @@ function matchesSearch(vehicle: Vehicle, query: string): boolean {
 }
 
 function applyFilters(vehicles: Vehicle[], filters: VehicleFilters): Vehicle[] {
+  const normalizedSearch = filters.search ? filters.search.toLowerCase() : ''
+  const minPrice = filters.priceMin ? Number(filters.priceMin) : null
+  const maxPrice = filters.priceMax ? Number(filters.priceMax) : null
+
   return vehicles.filter((vehicle) => {
-    if (filters.search && !matchesSearch(vehicle, filters.search)) return false
+    if (normalizedSearch && !matchesSearch(vehicle, normalizedSearch)) return false
     if (filters.make && vehicle.make !== filters.make) return false
     if (filters.bodyStyle && vehicle.body_style !== filters.bodyStyle) return false
     if (filters.province && vehicle.province !== filters.province) return false
 
     const price = getEffectivePrice(vehicle)
-    const min = Number(filters.priceMin)
-    const max = Number(filters.priceMax)
-    if (filters.priceMin && price < min) return false
-    if (filters.priceMax && price > max) return false
+    if (minPrice !== null && price < minPrice) return false
+    if (maxPrice !== null && price > maxPrice) return false
 
     return true
   })
@@ -69,6 +70,13 @@ export function useVehicleFilters(vehicles: Vehicle[]) {
     [vehicles, filters],
   )
 
+  const hasActiveFilters = useMemo(
+    () => Object.entries(filters).some(
+      ([key, value]) => value !== DEFAULT_FILTERS[key as keyof VehicleFilters],
+    ),
+    [filters],
+  )
+
   function updateFilter<K extends keyof VehicleFilters>(key: K, value: VehicleFilters[K]) {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
@@ -76,10 +84,6 @@ export function useVehicleFilters(vehicles: Vehicle[]) {
   function resetFilters() {
     setFilters(DEFAULT_FILTERS)
   }
-
-  const hasActiveFilters = Object.entries(filters).some(
-    ([key, value]) => value !== DEFAULT_FILTERS[key as keyof VehicleFilters],
-  )
 
   return { filters, filteredVehicles, updateFilter, resetFilters, hasActiveFilters }
 }

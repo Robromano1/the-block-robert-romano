@@ -9,7 +9,9 @@ function loadBidsFromStorage(): BidState {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return {}
     return JSON.parse(stored) as BidState
-  } catch {
+  } catch (error) {
+    console.error('Failed to load bids from localStorage. Bid history has been reset.', error)
+    localStorage.removeItem(STORAGE_KEY)
     return {}
   }
 }

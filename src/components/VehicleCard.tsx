@@ -1,29 +1,10 @@
 import { Link } from 'react-router'
 import type { Vehicle } from '@/types/vehicle'
+import { formatCurrency } from '@/lib/format'
+import { ConditionBadge } from '@/components/ConditionBadge'
 
 interface VehicleCardProps {
   vehicle: Vehicle
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-CA', {
-    style: 'currency',
-    currency: 'CAD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
-function ConditionBadge({ grade }: { grade: number }) {
-  let color = 'bg-red-100 text-red-700'
-  if (grade >= 4) color = 'bg-green-100 text-green-700'
-  else if (grade >= 3) color = 'bg-yellow-100 text-yellow-700'
-
-  return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${color}`}>
-      {grade.toFixed(1)}
-    </span>
-  )
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {

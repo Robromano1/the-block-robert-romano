@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { validateBid, getMinimumBid } from '@/hooks/useBids'
+import { formatCurrency } from '@/lib/format'
 
 interface BidFormProps {
   currentHighest: number
@@ -8,22 +9,15 @@ interface BidFormProps {
 
 type FormState = 'input' | 'confirm' | 'success'
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-CA', {
-    style: 'currency',
-    currency: 'CAD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
 function parseBidInput(input: string): number {
   const stripped = input.replace(/[^0-9.]/g, '')
-  return Number(stripped)
+  const [whole, decimal] = stripped.split('.')
+  const normalized = decimal !== undefined ? `${whole}.${decimal}` : whole
+  return Number(normalized)
 }
 
 export function BidForm({ currentHighest, onPlaceBid }: BidFormProps) {
-  const [bidInput, setBidInput] = useState('')
+  const [bidInput, setBidInput] = useState(getMinimumBid(currentHighest).toString())
   const [error, setError] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>('input')
 
@@ -48,7 +42,7 @@ export function BidForm({ currentHighest, onPlaceBid }: BidFormProps) {
     const amount = parseBidInput(bidInput)
     onPlaceBid(amount)
     setFormState('success')
-    setBidInput('')
+    setBidInput(getMinimumBid(amount).toString())
   }
 
   function handleCancel() {

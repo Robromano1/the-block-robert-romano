@@ -23,6 +23,7 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
             <button
               key={index}
               onClick={() => setSelectedIndex(index)}
+              aria-label={`View photo ${index + 1}`}
               className={`shrink-0 w-20 h-15 rounded-lg overflow-hidden border-2 transition ${
                 index === selectedIndex
                   ? 'border-blue-500'
